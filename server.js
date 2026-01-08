@@ -254,6 +254,10 @@ Return JSON ONLY in this format:
     res.status(500).json({ error: "Failed to generate plan" });
   }
 });
+app.get('/', (req, res) => {
+  res.send('Hello! The server is running.');
+});
+
 
 /* ===================== GET USER TRIPS ===================== */
 app.get("/api/my-trips", authenticateToken, async (req, res) => {
