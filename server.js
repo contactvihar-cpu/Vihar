@@ -167,7 +167,7 @@ async function geocodePlace(place) {
     const res = await fetch(url, {
       headers: {
         // Replace with your app name and contact email per Nominatim usage policy
-        "User-Agent": "TravelPlannerApp/1.0 (your-email@example.com)",
+        "User-Agent": "TravelPlannerApp/1.0 (contact@gmail.com)",
       },
     });
 
