@@ -11,15 +11,16 @@ const fetch = require("node-fetch");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+/* ===================== CORS ===================== */
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://your-frontend-domain.com"],
     credentials: true,
   })
 );
 app.use(express.json());
 
-/* ===================== MONGODB ===================== */
+/* ===================== MONGO CONNECT ===================== */
 mongoose
   .connect(process.env.MONGODB_URI, { dbName: "travelPlanner" })
   .then(() => console.log("✅ MongoDB connected"))
@@ -61,7 +62,7 @@ const openai = new OpenAI({
 /* ===================== GOOGLE CLIENT ===================== */
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-/* ===================== JWT MIDDLEWARE ===================== */
+/* ===================== JWT CHECK ===================== */
 function authenticateToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "Missing token" });
@@ -82,13 +83,14 @@ app.post("/api/register", async (req, res) => {
     res.json({ message: "Registered" });
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: "User already exists or invalid data" });
+    res.status(400).json({ error: "User already exists" });
   }
 });
 
 app.post("/api/login", async (req, res) => {
   try {
     const { username, password } = req.body;
+
     const user = await User.findOne({ username });
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
@@ -101,25 +103,24 @@ app.post("/api/login", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({ token, username });
+    res.json({ token, username, name: username });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Login failed" });
   }
 });
 
-/* ===================== GOOGLE AUTH ===================== */
+/* ===================== GOOGLE LOGIN ===================== */
 app.post("/api/google-auth", async (req, res) => {
   try {
     const { credential } = req.body;
-    if (!credential) return res.status(400).json({ error: "Missing token" });
-
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const { email, name } = ticket.getPayload();
+
     let user = await User.findOne({ username: email });
     if (!user)
       user = await User.create({ username: email, authProvider: "google" });
@@ -137,20 +138,7 @@ app.post("/api/google-auth", async (req, res) => {
   }
 });
 
-/* ===================== DISTANCE UTILS ===================== */
-function getDistanceKm(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-/* ===================== GEOCODING HELPER ===================== */
+/* ===================== GEO HELPERS ===================== */
 async function geocodePlace(place) {
   try {
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
@@ -162,42 +150,70 @@ async function geocodePlace(place) {
       },
     });
     const data = await res.json();
-    if (data && data.length > 0) {
-      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+
+    console.log("Geocode:", place, data.length ? data[0] : "No results");
+
+    if (data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon),
+      };
     }
-  } catch (e) {
-    console.error("Geocoding error for", place, e);
+    return null;
+  } catch (err) {
+    console.error("Geocode error:", place, err);
+    return null;
   }
-  return null;
 }
 
-/* ===================== GENERATE TRIP PLAN ===================== */
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) ** 2;
+
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/* ===================== GENERATE PLAN (WITH 50 KM VALIDATION) ===================== */
 app.post("/api/generate-plan", authenticateToken, async (req, res) => {
   const { startLocation, destination, days, interests, tripType } = req.body;
 
-  if (!startLocation || !destination || !days)
-    return res.status(400).json({ error: "Missing fields" });
-
   try {
-    // Ask OpenAI to include lat/lon for each place
-    const prompt = `
-Create a ${days}-day trip from ${startLocation} to ${destination}.
-Trip type: ${tripType}
-Interests: ${interests?.join(", ") || "general"}
+    const startCoords = await geocodePlace(startLocation);
+    const destCoords = await geocodePlace(destination);
 
-Return JSON ONLY in this format:
+    if (!startCoords || !destCoords)
+      return res.status(400).json({ error: "Unable to geocode locations" });
+
+    /* === AI PROMPT ENFORCING 50 KM LIMIT === */
+    const prompt = `
+Generate a ${days}-day trip itinerary from ${startLocation} to ${destination}.
+Trip type: ${tripType}
+Interests: ${interests?.join(", ")}
+
+RULES:
+- Only include places within 50 km of **start** or **destination**.
+- Never suggest Bangalore, Hyderabad, Chennai, or any distant places.
+- Return **pure JSON** in this format:
+
 {
   "places": [
     {
-      "name": "Place name",
-      "reason": "Reason to visit",
-      "lat": 12.3456,
-      "lon": 78.9012
+      "name": "Place Name",
+      "reason": "Why visit",
+      "lat": 12.34,
+      "lon": 56.78
     }
   ],
-  "plan": "Detailed itinerary as a string"
+  "plan": "Day by day itinerary text"
 }
-`;
+    `;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4.1-mini",
@@ -207,34 +223,31 @@ Return JSON ONLY in this format:
     const raw = response.choices[0].message.content;
     const parsed = JSON.parse(raw.match(/\{[\s\S]*\}/)[0]);
 
-    // For places missing lat or lon, use fallback geocoding
+    /* === Validate AI Provided Coordinates === */
     for (let place of parsed.places) {
-      if (
-        typeof place.lat !== "number" ||
-        typeof place.lon !== "number" ||
-        isNaN(place.lat) ||
-        isNaN(place.lon)
-      ) {
+      if (!place.lat || !place.lon) {
         const coords = await geocodePlace(place.name);
         if (coords) {
           place.lat = coords.lat;
           place.lon = coords.lon;
-        } else {
-          console.warn(`No coords found for place: ${place.name}`);
         }
       }
     }
 
-    // Filter places with valid lat/lon only
-    parsed.places = parsed.places.filter(
-      (p) =>
-        typeof p.lat === "number" &&
-        typeof p.lon === "number" &&
-        !isNaN(p.lat) &&
-        !isNaN(p.lon)
-    );
+    /* === Hard Filter 50 km === */
+    parsed.places = parsed.places.filter((p) => {
+      const d1 = getDistanceKm(startCoords.lat, startCoords.lon, p.lat, p.lon);
+      const d2 = getDistanceKm(destCoords.lat, destCoords.lon, p.lat, p.lon);
 
-    // Save trip to user
+      return d1 <= 50 || d2 <= 50;
+    });
+
+    if (!parsed.places.length)
+      return res.status(400).json({
+        error: "No valid places found within 50 km. Try different inputs.",
+      });
+
+    /* === SAVE Trip === */
     await User.findByIdAndUpdate(req.user.id, {
       $push: {
         trips: {
@@ -250,42 +263,27 @@ Return JSON ONLY in this format:
 
     res.json(parsed);
   } catch (err) {
-    console.error("Trip generation error:", err);
-    res.status(500).json({ error: "Failed to generate plan" });
+    console.error("Trip Generation Error:", err);
+    res.status(500).json({ error: "Failed to generate trip" });
   }
 });
-app.get('/', (req, res) => {
-  res.send('Hello! The server is running.');
-});
-
 
 /* ===================== GET USER TRIPS ===================== */
 app.get("/api/my-trips", authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: "User not found" });
-    res.json(user.trips.reverse());
-  } catch (err) {
-    console.error("Get trips error:", err);
-    res.status(500).json({ error: "Failed to get trips" });
-  }
+  const user = await User.findById(req.user.id);
+  res.json(user.trips.reverse());
 });
 
-/* ===================== GET SINGLE TRIP BY ID ===================== */
+/* ===================== GET SINGLE TRIP ===================== */
 app.get("/api/trip/:tripId", async (req, res) => {
-  try {
-    const users = await User.find({ "trips._id": req.params.tripId });
-    if (!users.length) return res.status(404).json({ error: "Trip not found" });
+  const users = await User.find({ "trips._id": req.params.tripId });
+  if (!users.length) return res.status(404).json({ error: "Trip not found" });
 
-    const trip = users[0].trips.id(req.params.tripId);
-    res.json(trip);
-  } catch (err) {
-    console.error("Get trip error:", err);
-    res.status(500).json({ error: "Failed to get trip" });
-  }
+  const trip = users[0].trips.id(req.params.tripId);
+  res.json(trip);
 });
 
-/* ===================== SERVER START ===================== */
+/* ===================== SERVER RUN ===================== */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
