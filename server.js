@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const OpenAI = require("openai");
 const { OAuth2Client } = require("google-auth-library");
+const fetch = require("node-fetch");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -149,6 +150,27 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+/* ===================== GEOCODING HELPER ===================== */
+async function geocodePlace(place) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+      place
+    )}&limit=1`;
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "TravelPlannerApp/1.0 (your-email@example.com)",
+      },
+    });
+    const data = await res.json();
+    if (data && data.length > 0) {
+      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    }
+  } catch (e) {
+    console.error("Geocoding error for", place, e);
+  }
+  return null;
+}
+
 /* ===================== GENERATE TRIP PLAN ===================== */
 app.post("/api/generate-plan", authenticateToken, async (req, res) => {
   const { startLocation, destination, days, interests, tripType } = req.body;
@@ -185,7 +207,25 @@ Return JSON ONLY in this format:
     const raw = response.choices[0].message.content;
     const parsed = JSON.parse(raw.match(/\{[\s\S]*\}/)[0]);
 
-    // Filter places with valid lat/lon
+    // For places missing lat or lon, use fallback geocoding
+    for (let place of parsed.places) {
+      if (
+        typeof place.lat !== "number" ||
+        typeof place.lon !== "number" ||
+        isNaN(place.lat) ||
+        isNaN(place.lon)
+      ) {
+        const coords = await geocodePlace(place.name);
+        if (coords) {
+          place.lat = coords.lat;
+          place.lon = coords.lon;
+        } else {
+          console.warn(`No coords found for place: ${place.name}`);
+        }
+      }
+    }
+
+    // Filter places with valid lat/lon only
     parsed.places = parsed.places.filter(
       (p) =>
         typeof p.lat === "number" &&
