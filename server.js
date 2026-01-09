@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000;
 /* ===================== MIDDLEWARE ===================== */
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["https://frontend-zeta-navy-37.vercel.app"],
     credentials: true,
   })
 );
