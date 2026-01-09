@@ -154,7 +154,9 @@ async function geocodePlace(place) {
     place
   )}`;
   const res = await fetch(url, {
-    headers: { "User-Agent": "travel-planner-app" },
+    headers: { "User-Agent": "travel-planner-app (contactvihar@gmail.com)" ,
+      "Accept-Language": "en",
+    },
   });
   const data = await res.json();
   if (!data.length) return null;
