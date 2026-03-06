@@ -1,0 +1,7 @@
+{
+  "name": "openai",
+  "version": "0.0.0-gemini-compat",
+  "description": "OpenAI-compatible wrapper that routes chat.completions to Gemini",
+  "main": "index.js",
+  "type": "commonjs"
+}

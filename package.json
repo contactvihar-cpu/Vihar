@@ -26,7 +26,7 @@
     "multer": "^2.0.2",
     "node-cache": "^5.1.2",
     "node-fetch": "^2.7.0",
-    "openai": "^6.15.0",
+    "openai": "file:./openai-gemini-compat",
     "resend": "^6.6.0"
   }
 }
