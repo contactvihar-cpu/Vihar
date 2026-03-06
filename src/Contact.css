@@ -1,0 +1,117 @@
+/* ================= PAGE BACKGROUND ================= */
+.contact-page {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(
+    circle at center,
+    #d9fbff 0%,
+    #c5f2f7 45%,
+    #b3e8ed 75%,
+    #a2dde3 100%
+  );
+  padding: 40px 20px;
+}
+
+/* ================= CARD ================= */
+.contact-card {
+  background: #ffffff;
+  max-width: 600px;
+  width: 100%;
+  padding: 45px 50px;
+  border-radius: 22px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* ================= HEADINGS ================= */
+.contact-card h2 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #003b66;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #444;
+  margin-bottom: 28px;
+}
+
+/* ================= FORM ================= */
+.contact-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-card input,
+.contact-card textarea {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.contact-card input:focus,
+.contact-card textarea:focus {
+  border-color: #1fa4c9;
+  box-shadow: 0 0 0 2px rgba(31, 164, 201, 0.15);
+}
+
+.contact-card textarea {
+  resize: vertical;
+}
+
+/* ================= BUTTON ================= */
+.contact-card button {
+  margin-top: 10px;
+  width: fit-content;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1fa4c9, #1989a8);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.contact-card button:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #1989a8, #1fa4c9);
+}
+
+/* ================= STATUS ================= */
+.success {
+  margin-top: 14px;
+  color: green;
+  font-weight: 600;
+}
+
+.error {
+  margin-top: 14px;
+  color: red;
+  font-weight: 600;
+}
+
+/* ================= CONTACT INFO ================= */
+.contact-info {
+  margin-top: 30px;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 20px;
+}
+
+.contact-info h3 {
+  margin-bottom: 10px;
+  color: #003b66;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 600px) {
+  .contact-card {
+    padding: 35px 28px;
+  }
+}

@@ -1,0 +1,186 @@
+/* ===== PAGE BACKGROUND ===== */
+.planner-container {
+  min-height: 100vh;
+  background: #ffffff; /* ✅ PURE WHITE */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem;
+  box-sizing: border-box;
+}
+
+
+/* Page title */
+.planner-container h2 {
+  color: #003b63;
+  margin-bottom: 1.5rem;
+}
+
+/* ===== MAIN WHITE CARD ===== */
+.form-box {
+  width: 100%;
+  max-width: 700px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
+  margin-bottom: 2rem;
+}
+
+/* ===== INPUT GROUP ===== */
+.input-box {
+  margin-bottom: 1.2rem;
+}
+
+.input-box label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #333;
+}
+
+/* Input + mic row */
+.input-mic-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Text input */
+.small-input {
+  flex: 1;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+/* Mic button */
+.mic-btn {
+  background: #e9f7fb;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 0.6rem;
+  cursor: pointer;
+}
+
+.mic-btn:hover {
+  background: #d0f0f8;
+}
+
+/* Select */
+select {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 1.2rem;
+}
+
+/* ===== GENERATE BUTTON ===== */
+.generate-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: #169bbf;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.generate-btn:hover {
+  background: #1389a8;
+}
+
+.generate-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Error */
+.error-text {
+  color: red;
+  margin-top: 0.8rem;
+}
+
+/* ===== RESULT CARD ===== */
+.result-box,
+.favorites-box,
+.history-box {
+  width: 100%;
+  max-width: 700px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
+  margin-top: 2rem;
+}
+
+/* Headings inside cards */
+.result-box h3,
+.favorites-box h3 {
+  color: #003b63;
+  margin-bottom: 1rem;
+}
+
+/* ===== PLACE ITEMS ===== */
+.place-item,
+.favorite-item {
+  border-bottom: 1px solid #eee;
+  padding: 0.8rem 0;
+}
+
+.place-item:last-child,
+.favorite-item:last-child {
+  border-bottom: none;
+}
+
+/* Save button */
+.fav-btn {
+  background: transparent;
+  border: 1px solid #169bbf;
+  color: #169bbf;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.fav-btn.active {
+  background: #169bbf;
+  color: white;
+}
+
+/* ===== ITINERARY ===== */
+.day-box {
+  background: #f6fcff;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.day-box h4 {
+  color: #003b63;
+  margin-bottom: 0.4rem;
+}
+
+/* ===== HISTORY ===== */
+.history-toggle {
+  background: none;
+  border: none;
+  color: #169bbf;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 0.6rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .form-box,
+  .result-box,
+  .favorites-box,
+  .history-box {
+    padding: 1.5rem;
+  }
+}

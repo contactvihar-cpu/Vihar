@@ -1,38 +1,425 @@
+/* ======= Base App Container ======= */
 .App {
   text-align: center;
-}
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  /* Background & layout */
+  position: relative;
+  width: 100%;
   min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #89cff0, #b0e0e6, #e6f7ff);
+  background-size: 300% 300%;
+  animation: gradientMove 15s ease infinite;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+
+  overflow-x: hidden; /* avoid horizontal scroll */
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.App-link {
-  color: #61dafb;
+/* Gradient Animation */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ======= Logo with spin ======= */
+.App-logo {
+  height: 40vmin;
+  max-height: 250px;
+  pointer-events: none;
+
+  animation: App-logo-spin infinite 20s linear;
+  filter: drop-shadow(0 0 8px rgba(0, 119, 255, 0.5));
+  transition: filter 0.3s ease;
+}
+
+.App-logo:hover,
+.App-logo:focus {
+  filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.8));
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .App-logo {
+    animation: none;
   }
 }
+
+/* ======= Header with Glassmorphism ======= */
+.App-header {
+  background: rgba(255, 255, 255, 0.32);
+  backdrop-filter: saturate(180%) blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+
+  min-height: auto;
+  padding: 40px;
+  border-radius: 22px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  font-size: calc(10px + 2vmin);
+  color: #003d66;
+  width: 420px;
+  margin: 0 auto;
+
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.App-header:hover,
+.App-header:focus-within {
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* ======= Links ======= */
+.App-link {
+  color: #005fcc;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  outline-offset: 2px;
+}
+
+.App-link:hover,
+.App-link:focus {
+  color: #003d99;
+  text-decoration: underline;
+  outline: none;
+}
+
+.App-link:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
+}
+
+/* ======= Navigation Bar ======= */
+.main-nav {
+  background-color: #282c34;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  color: white;
+  font-weight: 600;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+}
+
+.main-nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.main-nav a:hover,
+.main-nav a:focus-visible {
+  color: #f7c948;
+  text-decoration: underline;
+  outline-offset: 2px;
+  outline: none;
+}
+
+.main-nav a:focus-visible {
+  outline: 3px solid #f7c948;
+  outline-offset: 3px;
+}
+
+/* Welcome text & logout button aligned right */
+.welcome-text {
+  margin-left: auto;
+  font-size: 1.1rem;
+  color: #90ee90;
+  user-select: text;
+}
+
+.logout-btn {
+  margin-left: 15px;
+  background-color: #d9534f;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 8px rgba(217, 83, 79, 0.4);
+}
+
+.logout-btn:hover,
+.logout-btn:focus-visible {
+  background-color: #c9302c;
+  box-shadow: 0 6px 12px rgba(201, 48, 44, 0.7);
+  outline: none;
+}
+
+.logout-btn:focus-visible {
+  outline: 3px solid #c9302c;
+  outline-offset: 2px;
+}
+
+/* ======= Home container ======= */
+.home-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #89cff0, #b0e0e6, #e6f7ff);
+  background-size: 300% 300%;
+  animation: gradientMove 15s ease infinite;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* ======= Floating plane animation ======= */
+.plane-icon {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  left: 40px;
+  top: 40px;
+  animation: floatPlane 3s ease-in-out infinite;
+  transform: rotate(-20deg);
+  z-index: 1;
+  will-change: transform;
+}
+
+@keyframes floatPlane {
+  0%, 100% { transform: translateY(0px) rotate(-20deg); }
+  50% { transform: translateY(-12px) rotate(-20deg); }
+}
+
+/* ======= Traveller image with fade in ======= */
+.traveller-img {
+  width: 140px;
+  height: 140px;
+  position: absolute;
+  left: 20px;
+  top: 150px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 1.5s ease-out forwards;
+  opacity: 0;
+  z-index: 1;
+  object-fit: cover;
+  user-select: none;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* ======= Main card with glass effect and slide-up ======= */
+.form-box {
+  width: 420px;
+  max-width: 90vw;
+  padding: 35px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.32);
+  backdrop-filter: saturate(180%) blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.7s ease-out;
+  z-index: 2;
+  transition: box-shadow 0.3s ease;
+}
+
+.form-box:hover,
+.form-box:focus-within {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Form heading */
+.form-box h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 28px;
+  color: #003d66;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ======= Input fields ======= */
+.input-field {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1.5px solid #aacbe0;
+  background: rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+  font-size: 15px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  font-family: inherit;
+}
+
+.input-field::placeholder {
+  color: #779ecb;
+  font-style: italic;
+}
+
+.input-field:focus {
+  border-color: #0077ff;
+  box-shadow: 0 0 10px rgba(0, 119, 255, 0.35);
+  outline: none;
+}
+
+.input-field:focus-visible {
+  outline: 3px solid #0077ff;
+  outline-offset: 2px;
+}
+
+/* ======= Buttons ======= */
+.form-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #0077ff, #0099ff);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 700;
+  transition: transform 0.2s ease, background 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0, 119, 255, 0.45);
+  user-select: none;
+}
+
+.form-btn:hover,
+.form-btn:focus-visible {
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, #005fcc, #007be6);
+  box-shadow: 0 8px 20px rgba(0, 95, 204, 0.6);
+  outline: none;
+}
+
+.form-btn:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 3px;
+}
+
+/* ======= Toggle text for login/signup switch ======= */
+.toggle-text {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 15px;
+  cursor: default;
+  color: #003d66;
+  user-select: none;
+}
+
+.toggle-text span {
+  color: #005fcc;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.toggle-text span:hover,
+.toggle-text span:focus-visible {
+  color: #003d99;
+  text-decoration: underline;
+  outline-offset: 2px;
+}
+
+.toggle-text span:focus-visible {
+  outline: 3px solid #003d99;
+}
+
+/* ======= Google login wrapper ======= */
+.google-login-wrapper {
+  margin-top: 20px;
+  text-align: center;
+  font-weight: 700;
+  color: #003d66;
+  user-select: none;
+}
+
+/* ======= Feedback messages ======= */
+.error-message {
+  color: #ff3838;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 6px;
+  font-weight: 600;
+  user-select: none;
+}
+
+.success-message {
+  color: #009944;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 6px;
+  font-weight: 600;
+  user-select: none;
+}
+
+/* ======= Welcome box ======= */
+.welcome-box {
+  width: 420px;
+  max-width: 90vw;
+  padding: 35px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.32);
+  backdrop-filter: saturate(180%) blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  color: #003d66;
+  font-size: 22px;
+  font-weight: 700;
+  z-index: 2;
+  user-select: none;
+}
+
+.welcome-box button.form-btn {
+  margin-top: 20px;
+  max-width: 180px;
+  align-self: center;
+}
+
+/* Responsive improvements */
+@media (max-width: 480px) {
+  .App-header,
+  .form-box,
+  .welcome-box {
+    width: 90vw;
+    padding: 25px 20px;
+    font-size: 16px;
+  }
+
+  .App-logo {
+    height: 30vmin;
+  }
+
+  .main-nav {
+    padding: 1rem;
+    gap: 1rem;
+  }
+}
+.logout-btn { margin-left: 15px; background-color: #d9534f; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; color: white; font-weight: 600; transition: background-color 0.3s ease; }
+.logout-btn:hover { background-color: #c9302c; } /* Page background */ .home-container { position: relative; width: 100%; min-height: 100vh; padding: 20px; background: linear-gradient(135deg, #89cff0, #b0e0e6, #e6f7ff); background-size: 300% 300%; animation: gradientMove 15s ease infinite; display: flex; justify-content: center; align-items: center; overflow: hidden; }

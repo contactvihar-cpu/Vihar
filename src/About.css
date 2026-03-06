@@ -1,0 +1,66 @@
+/* Page background */
+.about-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #bfeff4, #dff8fb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  box-sizing: border-box;
+}
+
+/* White card */
+.about-card {
+  width: 100%;
+  max-width: 700px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem 3rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
+}
+
+/* Main heading */
+.about-card h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #003b63;
+}
+
+/* Paragraphs */
+.about-card p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* Section spacing */
+.about-card section {
+  margin-top: 2rem;
+}
+
+/* Section titles */
+.about-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.6rem;
+  color: #003b63;
+}
+
+/* Lists */
+.about-card ul {
+  padding-left: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.about-card li {
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  color: #444;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .about-card {
+    padding: 2rem;
+  }
+}
